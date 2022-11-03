@@ -11,11 +11,18 @@ aws s3 sync s3://raster/COP90/ data --recursive --endpoint-url https://opentopog
 ####################################### gebco 2022 #################################
 # download the global coverage grid from
 # https://www.gebco.net/data_and_products/gridded_bathymetry_data/#global
-# Get the one that says "sub-ice topo/bathy"
+# Get the one that says "sub-ice topo/bathy" or the one that says "ice surface elevation"
 gebco_data_dir="data/gebco_2022_sub_ice"
 gebco_zip_file="${gebco_data_dir}/gebco_2022_sub_ice_topo_geotiff.zip"
 mkdir -p ${gebco_data_dir}
 unzip ${gebco_zip_file} -d ${gebco_data_dir}
+rm ${gebco_zip_file}
+
+gebco_data_dir="data/gebco_2022"
+gebco_zip_file="${gebco_data_dir}/gebco_2022_topo_geotiff.zip"
+mkdir -p ${gebco_data_dir}
+unzip ${gebco_zip_file} -d ${gebco_data_dir}
+rm ${gebco_zip_file}
 
 ############################### SF bay topography/bathymetery #################################
 # https://www.usgs.gov/core-science-systems/eros/coned/science/topobathymetric-elevation-model-san-francisco-bay-area?qt-science_center_objects=0#qt-science_center_objects
@@ -25,6 +32,7 @@ sfbay_zip_file="${sfbay_data_dir}/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS.zip"
 mkdir -p ${sfbay_data_dir}
 wget https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/Topobathy/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS.zip -P ${sfbay_data_dir}
 unzip ${sfbay_zip_file} -d ${sfbay_data_dir}
+rm ${sfbay_zip_file}
 
 ################################# greenland (measures project) #################################
 # The data that we want is here:

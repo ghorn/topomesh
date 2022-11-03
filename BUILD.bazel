@@ -53,6 +53,13 @@ topos = {
         "hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
         "target_size": 10,
     },
+    "gebco_2022": {
+        "dems": glob(["data/gebco_2022/*.tif"]),
+        "resize_args": "-outsize 3% 0 -r cubic",
+        #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
+        "hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
+        "target_size": 10,
+    },
     "copernicus": {
         "dems": glob([
             "data/COP90_hh/Copernicus_DSM_COG_30_{coord}_DEM.tif".format(coord = coord)
