@@ -1,0 +1,28 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hmm",
+    srcs = [
+        "src/base.cpp",
+        "src/base.h",
+        "src/blur.cpp",
+        "src/blur.h",
+        "src/cmdline.h",
+        "src/heightmap.cpp",
+        "src/heightmap.h",
+        "src/main.cpp",
+        "src/stb_image.h",
+        "src/stb_image_write.h",
+        "src/stl.cpp",
+        "src/stl.h",
+        "src/triangulator.cpp",
+        "src/triangulator.h",
+    ],
+    copts = [
+    	"-Werror",
+        #"-std=c++11", # default?
+        # just silence whatever warnings there are
+        "-Wno-comment",
+        "-Wno-sign-compare",
+    ],
+)

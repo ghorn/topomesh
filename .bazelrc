@@ -1,0 +1,3 @@
+# build --disk_cache=~/.ls ~/path/to/build/cache
+
+build -c opt

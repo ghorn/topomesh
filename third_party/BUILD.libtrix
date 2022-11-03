@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "libtrix",
+    srcs = [
+        "libtrix.c",
+    ],
+    hdrs = [
+        "libtrix.h",
+    ],
+    copts = [
+        "-Werror",
+        "-std=c11",
+    ],
+    includes = ["."],
+)

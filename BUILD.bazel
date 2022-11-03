@@ -1,0 +1,86 @@
+load(":pad_string.bzl", "pad")
+load(":pipeline.bzl", "process_terrains")
+
+py_binary(
+    name = "zscale",
+    srcs = ["zscale.py"],
+)
+
+# copernicus coordinatescat
+north_range = range(24, 72)
+
+max_east = 39
+
+max_west = 135
+
+copernicus_coords = \
+    ["N{n}_00_W{w}_00".format(
+        n = pad(n, 2),
+        w = pad(w, 3),
+    ) for n in north_range for w in range(1, max_west)] + \
+    ["N{n}_00_E{e}_00".format(
+        e = pad(e, 3),
+        n = pad(n, 2),
+    ) for n in north_range for e in range(0, max_east)]
+
+# all the topographies to be processed
+topos = {
+    "sfbay_topobathy": {
+        "dems": glob(["data/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS.tif"]),
+        #"region_of_interest": {"ul": (544049,4193800), "lr": (553362,4182147)},
+        "region_of_interest": {
+            "ul": (538300, 4194644),
+            "lr": (558250, 4175530),
+        },
+        #"resize_args": "-outsize 5% 0 -r cubic",
+        "contour_level": 0.,
+        "hmm_args": "--triangles 1000000 -e 0.0001 -b 0.7",  # --border-size 300",
+        "target_size": 10,
+    },
+    "measures_greenland": {
+        "dems": glob(["data/measures_greenland/*/*/*/*/tile_*_dem_*.tif"]),
+        # don't shrink, it's fine
+        #"resize_args": "-outsize 5% 0 -r cubic",
+        "contour_level": 0.,
+        #"hmm_args": "--triangles 2000c000 -e 0.001 --blur 4 --gamma 0.2"
+        "hmm_args": "--triangles 10000000 -e 0.0001 -b 0.7",
+        "target_size": 10,
+    },
+    "gebco_2022_sub_ice": {
+        "dems": glob(["data/gebco_2022_sub_ice/*.tif"]),
+        "resize_args": "-outsize 3% 0 -r cubic",
+        #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
+        "hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
+        "target_size": 10,
+    },
+    "copernicus": {
+        "dems": glob([
+            "data/COP90_hh/Copernicus_DSM_COG_30_{coord}_DEM.tif".format(coord = coord)
+            for coord in copernicus_coords
+        ]),
+        #"resize_args": "-outsize 1% 0 -r cubic",
+        "resize_args": "-outsize 5% 0 -r cubic",
+        #"resize_args": -outsize 10% 0 -r cubic",
+        "hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
+        #"hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
+        "target_size": 10,
+    },
+}
+
+process_terrains(topos)
+
+## convert to ellipsoid
+#genrule(
+#    name = "ellipsoid",
+#    srcs = [
+#        "copernicus.stl",
+#    ],
+#    outs = ["ellipsoid.ply"],
+#    cmd = """\
+#$(location //src/meshtools:llh2ecef) $< $@
+#du -hs $@
+#""",
+#    tools = [
+#        "//src/meshtools:llh2ecef",
+#    ]
+#)

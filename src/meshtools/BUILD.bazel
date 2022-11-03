@@ -1,0 +1,126 @@
+# Save and load meshes.
+cxx_opts = [
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wconversion",
+    "-Wcast-align",
+    "-Wdouble-promotion",
+    "-Wformat-security",
+    "-Winvalid-pch",
+    "-Wmissing-format-attribute",
+    "-Wnull-dereference",
+    "-Wpacked",
+    "-Wpointer-arith",
+    "-Wredundant-decls",
+    "-Wshadow",
+    "-Wsign-compare",
+    "-Wsign-conversion",
+    "-Wswitch-default",
+    "-Wswitch-enum",
+    "-Wundef",
+    "-Wunused",
+    "-Wwrite-strings",
+    "-Wduplicated-branches",
+    "-Wduplicated-cond",
+    "-Wlogical-op",
+    "-Wmisleading-indentation",
+    "-Wunused-but-set-parameter",
+    "-Wuseless-cast",
+    "-Winit-self",
+    "-Wnon-virtual-dtor",
+    #"-Wold-style-cast",
+    "-Woverloaded-virtual",
+    "-fdiagnostics-color=always",
+]
+
+cc_library(
+    name = "meshtools",
+    srcs = [
+        "hash.hpp",
+        "ply.cpp",
+        "ply.hpp",
+        "stl.cpp",
+        "stl.hpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+)
+
+# Convert PLY to STL.
+cc_binary(
+    name = "ply2stl",
+    srcs = [
+        "ply2stl.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
+
+# Roundtrip PLY for testing purposes.
+cc_binary(
+    name = "roundtrip_ply",
+    srcs = [
+        "roundtrip_ply.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
+
+# Roundtrip STL for testing purposes.
+cc_binary(
+    name = "roundtrip_stl",
+    srcs = [
+        "roundtrip_stl.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
+
+# Scale mesh to a certain size.
+cc_binary(
+    name = "size_stl",
+    srcs = [
+        "size_stl.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
+
+# Scale mesh by a factor.
+cc_binary(
+    name = "scale_stl",
+    srcs = [
+        "scale_stl.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
+
+# Print dimensions of mesh.
+cc_binary(
+    name = "print_stl_dimensions",
+    srcs = [
+        "print_stl_dimensions.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
+
+# Convert LLH mesh to ECEF.
+cc_binary(
+    name = "llh2ecef",
+    srcs = [
+        "llh2ecef.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)
