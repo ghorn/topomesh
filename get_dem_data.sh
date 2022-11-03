@@ -2,9 +2,8 @@
 
 set -euo pipefail
 
+##################################### copernicus #############################
 # See https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
-
-###### copernicus #######
 # download dems
 aws s3 cp s3://raster/COP90/ data --recursive --endpoint-url https://opentopography.s3.sdsc.edu --no-sign-request
 # sync (download missing dems)
