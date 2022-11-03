@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # See https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
 
 ###### copernicus #######
