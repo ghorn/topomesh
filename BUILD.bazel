@@ -27,11 +27,8 @@ copernicus_coords = \
 topos = {
     "sfbay_topobathy": {
         "dems": glob(["data/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS.tif"]),
-        #"region_of_interest": {"ul": (544049,4193800), "lr": (553362,4182147)},
-        "region_of_interest": {
-            "ul": (538300, 4194644),
-            "lr": (558250, 4175530),
-        },
+        #                                                      ulx    uly     lrx    lry
+        "region_of_interest_command": "gdal_translate -projwin 538300 4194644 558250 4175530",
         #"resize_args": "-outsize 5% 0 -r cubic",
         "contour_level": 0.,
         "hmm_args": "--triangles 1000000 -e 0.0001 -b 0.7",  # --border-size 300",
@@ -39,9 +36,11 @@ topos = {
     },
     "measures_greenland": {
         "dems": glob(["data/measures_greenland/*/*/*/*/tile_*_dem_*.tif"]),
+        # original is 49860 x 90000
+        "region_of_interest_command": "gdal_translate -srcwin 12000 82000 16001 8000 -outsize 16001 8000",
         # don't shrink, it's fine
-        #"resize_args": "-outsize 5% 0 -r cubic",
-        "contour_level": 0.,
+        "resize_args": "-outsize 25% 0 -r cubic",
+        # "contour_level": 0.,
         #"hmm_args": "--triangles 2000c000 -e 0.001 --blur 4 --gamma 0.2"
         "hmm_args": "--triangles 10000000 -e 0.0001 -b 0.7",
         "target_size": 10,

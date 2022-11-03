@@ -26,35 +26,15 @@ du -hs $@
         )
 
     # optionally extract a region of interest
-    if "region_of_interest" not in topo:
+    if "region_of_interest_command" not in topo:
         region_of_interest_name = merged_geotiff_name
     else:
         region_of_interest_name = "{name}_region_of_interest".format(**topo)
-
-        ul = topo["region_of_interest"]["ul"]
-        lr = topo["region_of_interest"]["lr"]
-
-        ulx = ul[0]
-        uly = ul[1]
-        lrx = lr[0]
-        lry = lr[1]
-
         native.genrule(
             name = region_of_interest_name,
             srcs = [merged_geotiff_name],
             outs = [region_of_interest_name + ".tif"],
-            #cmd = "gdal_translate -srcwin {xoff} {yoff} {xsize} {ysize} -outsize {xsize} {ysize} $< $@".format(
-            #    xoff=xoff,
-            #    yoff=yoff,
-            #    xsize=xsize,
-            #    ysize=ysize,
-            #),
-            cmd = "gdal_translate -projwin {ulx} {uly} {lrx} {lry} $< $@".format(
-                ulx = ulx,
-                uly = uly,
-                lrx = lrx,
-                lry = lry,
-            ),
+            cmd = topo["region_of_interest_command"] + " $< $@",
         )
 
     # resize the geotiff
