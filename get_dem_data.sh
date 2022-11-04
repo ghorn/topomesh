@@ -2,6 +2,25 @@
 
 set -euo pipefail
 
+################################## CUDEM hawaii ##########################
+# ninth arc-second (3m) digital elevation model of the Hawaiian Islands
+# https://chs.coast.noaa.gov/htdata/raster2/elevation/NCEI_ninth_Topobathy_Hawaii_9428/
+# this is mostly the islands over land
+
+# third arc-second (10m) digital elevation model of the Hawaiian Islands
+# https://chs.coast.noaa.gov/htdata/raster2/elevation/NCEI_third_Topobathy_Hawaii_9429/
+# this is mostly the islands under land
+
+# download both data sets
+hawaii_data_dir="data/cudem_hawaii"
+mkdir -p ${hawaii_data_dir}
+for hawaii_dataset in "NCEI_ninth_Topobathy_Hawaii_9428" "NCEI_third_Topobathy_Hawaii_9429"
+wget -np -r -nH -L --cut-dirs=5 --no-check-certificate \
+    "https://chs.coast.noaa.gov/htdata/raster2/elevation/${hawaii_dataset}/tiles/" \
+    -A tif \
+    -P ${hawaii_data_dir}
+
+
 ##################################### copernicus #############################
 # See https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
 # download dems

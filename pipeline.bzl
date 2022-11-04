@@ -15,14 +15,15 @@ def _process_terrain(name, topo):
     else:
         # if there is more than one, merge them into one tile
         merged_geotiff_name = "{name}_merged_geotiff".format(**topo)
+        gdal_merge_args = topo["gdal_merge_args"] if "gdal_merge_args" in topo else ""
         native.genrule(
             name = merged_geotiff_name,
             srcs = dem_srcs,
             outs = ["{name}.tif".format(**topo)],
             cmd = """\
-gdal_merge.py -o $@ $(SRCS)
+gdal_merge.py {gdal_merge_args} -o $@ $(SRCS)
 du -hs $@
-""",
+""".format(gdal_merge_args = gdal_merge_args),
         )
 
     # optionally extract a region of interest
@@ -37,7 +38,7 @@ du -hs $@
             cmd = topo["region_of_interest_command"] + " $< $@",
         )
 
-    # resize the geotiff
+    # optionally resize the geotiff
     if "resize_args" not in topo:
         resized_name = region_of_interest_name
     else:
