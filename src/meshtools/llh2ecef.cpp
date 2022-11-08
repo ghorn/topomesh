@@ -90,21 +90,6 @@ int32_t main(int32_t argc, char *argv[]) {
   std::vector<glm::ivec3> triangles;
   ReadBinarySTL(input_path, points, triangles);
 
-  {
-    // *********** sanity check ***********
-    const double end_lat_deg = lat0_deg + dlat_deg_dpixel * static_cast<double>(n_lat);
-    const double end_lon_deg = lon0_deg + dlon_deg_dpixel * static_cast<double>(n_lon);
-
-    if (std::abs(end_lat_deg - (29.9995834)) > 0.001) {
-      fprintf(stderr, "bad end lat %.15f\n", end_lat_deg);
-      std::exit(1);
-    }
-    if (std::abs(end_lon_deg - (-114.9995834)) > 0.001) {
-      fprintf(stderr, "bad end lon %.15f\n", end_lon_deg);
-      std::exit(1);
-    }
-  }
-
   // Reference ECEF
   const double center_lat_deg = lat0_deg + 0.5 * dlat_deg_dpixel * static_cast<double>(n_lat);
   const double center_lon_deg = lon0_deg + 0.5 * dlon_deg_dpixel * static_cast<double>(n_lon);
