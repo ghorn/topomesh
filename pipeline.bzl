@@ -98,8 +98,7 @@ du -hs $@
         outs = ["{name}_unscaled.stl".format(**topo)],
         cmd = """\
 # triangulate
-$(location @hmm//:hmm) $(location {png}) $@ --zscale `cat $(location {gdalinfo}) | $(location :zscale) 1` {hmm_args}
-
+$(location @hmm//:hmm) $(location {png}) $@ --zscale 1.0 {hmm_args}
 echo "--------------------------------------"
 
 # print dimensions
@@ -116,16 +115,20 @@ du -hs $@
         ],
     )
 
-    # scale the mesh to true coordinates
-    geoscaled_stl_name = "{name}_geoscaled_stl".format(**topo)
-    native.genrule(
-        name = geoscaled_stl_name,
-        srcs = [
-            unscaled_stl_name,
-            gdalinfo_name,
-        ],
-        outs = ["{name}_geoscaled.stl".format(**topo)],
-        cmd = """\
+    # convert to ECEF
+    if "output_scaling" in topo and topo["output_scaling"] == "llh2ecef":
+        convert_to_ecef(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"])
+    else:
+        # scale the mesh to true coordinates
+        geoscaled_stl_name = "{name}_geoscaled_stl".format(**topo)
+        native.genrule(
+            name = geoscaled_stl_name,
+            srcs = [
+                unscaled_stl_name,
+                gdalinfo_name,
+            ],
+            outs = ["{name}_geoscaled.stl".format(**topo)],
+            cmd = """\
 # scale mesh
 cat $(location {gdalinfo}) | $(location :zscale) 2 | xargs $(location //src/meshtools:scale_stl) $(location {unscaled_stl}) $@
 
@@ -139,24 +142,24 @@ echo "--------------------------------------"
 # print file size
 du -hs $@
 """.format(gdalinfo = gdalinfo_name, unscaled_stl = unscaled_stl_name, **topo),
-        tools = [
-            "//src/meshtools:scale_stl",
-            ":zscale",
-            "//src/meshtools:print_stl_dimensions",
-        ],
-    )
-
-    # scale the mesh to user-defined coordinates
-    if "target_size" in topo:
-        stl_name = "{name}_scaled_to_target_stl".format(**topo)
-        native.genrule(
-            name = stl_name,
-            srcs = [
-                unscaled_stl_name,
-                gdalinfo_name,
+            tools = [
+                "//src/meshtools:scale_stl",
+                ":zscale",
+                "//src/meshtools:print_stl_dimensions",
             ],
-            outs = ["{name}_scaled_to_target.stl".format(**topo)],
-            cmd = """\
+        )
+
+        # scale the mesh to user-defined coordinates
+        if "target_size" in topo:
+            stl_name = "{name}_scaled_to_target_stl".format(**topo)
+            native.genrule(
+                name = stl_name,
+                srcs = [
+                    unscaled_stl_name,
+                    gdalinfo_name,
+                ],
+                outs = ["{name}_scaled_to_target.stl".format(**topo)],
+                cmd = """\
 # scale mesh
 $(location //src/meshtools:size_stl) $(location {unscaled_stl}) $@ {target_size}
 
@@ -166,11 +169,11 @@ $(location //src/meshtools:print_stl_dimensions) $@
 # print file size
 du -hs $@
 """.format(gdalinfo = gdalinfo_name, unscaled_stl = unscaled_stl_name, **topo),
-            tools = [
-                "//src/meshtools:size_stl",
-                "//src/meshtools:print_stl_dimensions",
-            ],
-        )
+                tools = [
+                    "//src/meshtools:size_stl",
+                    "//src/meshtools:print_stl_dimensions",
+                ],
+            )
 
     # optionally make a contour
     if "contour_level" in topo:
@@ -203,4 +206,40 @@ du -hs $@
             "$(location //src/meshtools:roundtrip_stl)",
             "$(location {stl_name})".format(stl_name = unscaled_stl_name),
         ],
+    )
+
+def convert_to_ecef(name, gdalinfo_name, unscaled_stl_name, target_size, z_exag):
+    ecef_stl_name = "{}_ecef_stl".format(name)
+    native.genrule(
+        name = ecef_stl_name,
+        srcs = [unscaled_stl_name, gdalinfo_name],
+        outs = ["{}_ecef.stl".format(name)],
+        cmd = """\
+# we expect the geoTransform to be something like:
+#   [
+#     -128.000416666665,
+#     0.00083333333,
+#     0,
+#     37.000416662664996,
+#     0,
+#     -0.00083333333
+#   ]
+# Make sure those numbers are 0
+test `jq ".geoTransform[2]" $(location {gdalinfo})` -eq 0
+test `jq ".geoTransform[4]" $(location {gdalinfo})` -eq 0
+
+$(location //src/meshtools:llh2ecef) $(location {input_stl}) $@ \
+    `jq ".geoTransform[0]" $(location {gdalinfo})` \
+    `jq ".geoTransform[1]" $(location {gdalinfo})` \
+    `jq ".geoTransform[3]" $(location {gdalinfo})` \
+    `jq ".geoTransform[5]" $(location {gdalinfo})` \
+    `jq ".size[0]" $(location {gdalinfo})` \
+    `jq ".size[1]" $(location {gdalinfo})` \
+    `jq ".bands[0].computedMin" $(location {gdalinfo})` \
+    `jq ".bands[0].computedMax" $(location {gdalinfo})` \
+    {target_size} \
+    {z_exag}
+
+""".format(gdalinfo = gdalinfo_name, input_stl = unscaled_stl_name, target_size = target_size, z_exag = z_exag),
+        tools = ["//src/meshtools:llh2ecef"],
     )

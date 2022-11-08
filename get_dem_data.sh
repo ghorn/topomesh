@@ -2,6 +2,17 @@
 
 set -euo pipefail
 
+####################### U.S. Coastal Relief Model - Southern California Version 2 ##################
+socal_data_dir="data/socal"
+mkdir -p "$socal_data_dir"
+# 1 arc-second
+#wget "https://www.ngdc.noaa.gov/thredds/fileServer/crm/crm_socal_1as_vers2.nc" -P ${socal_data_dir}
+#gdal_translate "${socal_data_dir}/crm_socal_1as_vers2.nc" "${socal_data_dir}/crm_socal_1as_vers2.tif"
+# 3 arc-second
+wget "https://www.ngdc.noaa.gov/thredds/fileServer/crm/crm_socal_3as_vers2.nc" -P ${socal_data_dir}
+gdal_translate "${socal_data_dir}/crm_socal_3as_vers2.nc" "${socal_data_dir}/crm_socal_3as_vers2.tif"
+
+
 ################################## CUDEM hawaii ##########################
 # ninth arc-second (3m) digital elevation model of the Hawaiian Islands
 # https://chs.coast.noaa.gov/htdata/raster2/elevation/NCEI_ninth_Topobathy_Hawaii_9428/

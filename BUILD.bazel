@@ -25,6 +25,15 @@ copernicus_coords = \
 
 # all the topographies to be processed
 topos = {
+    "socal": {
+        "dems": glob(["data/socal/*3as*.tif"]),
+        # "resize_args": "-outsize 20% 0 -r cubic",
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -122.2 35.5 -115 30",
+        "hmm_args": "--triangles 5000000 -e 0.000001 --blur 2",
+        "target_size": 10,
+        "output_scaling": "llh2ecef",
+        "z_exag": 5,
+    },
     "hawaii": {
         "dems": glob(["data/cudem_hawaii/*.tif"]),
         "resize_args": "-outsize 25% 0 -r cubic",
