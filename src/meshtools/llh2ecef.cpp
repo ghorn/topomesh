@@ -162,7 +162,7 @@ int32_t main(int32_t argc, char *argv[]) {
   // output translation/scaling
   const float xy_scale_factor = static_cast<float>(target_size / std::min(max_x - min_x, max_y - min_y));
   for (glm::vec3 &point : points) {
-    point.z -= static_cast<float>(min_z);
+    point.z -= static_cast<float>(max_z);
     point *= xy_scale_factor;
   }
 
