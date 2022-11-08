@@ -13,6 +13,17 @@ wget "https://www.ngdc.noaa.gov/thredds/fileServer/crm/crm_socal_3as_vers2.nc" -
 gdal_translate "${socal_data_dir}/crm_socal_3as_vers2.nc" "${socal_data_dir}/crm_socal_3as_vers2.tif"
 
 
+############################ etopo 2022 ##########################
+# this is a global bathymetry dataset
+etopo_data_dir="data/etopo"
+mkdir -p ${etopo_data_dir}
+wget -np -r -nH -L \
+    --cut-dirs=7 \
+    --no-check-certificate \
+    "https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/15s/15s_bed_elev_gtif/" \
+    -A tif \
+    -P ${etopo_data_dir}
+
 ################################## CUDEM hawaii ##########################
 # ninth arc-second (3m) digital elevation model of the Hawaiian Islands
 # https://chs.coast.noaa.gov/htdata/raster2/elevation/NCEI_ninth_Topobathy_Hawaii_9428/
@@ -30,7 +41,6 @@ wget -np -r -nH -L --cut-dirs=5 --no-check-certificate \
     "https://chs.coast.noaa.gov/htdata/raster2/elevation/${hawaii_dataset}/tiles/" \
     -A tif \
     -P ${hawaii_data_dir}
-
 
 ##################################### copernicus #############################
 # See https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
