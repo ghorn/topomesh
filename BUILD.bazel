@@ -34,14 +34,16 @@ topos = {
         "output_scaling": "llh2ecef",
         "z_exag": 5,
     },
-    "hawaii": {
+    "hawaii_cudem": {
         "dems": glob(["data/cudem_hawaii/*.tif"]),
         "resize_args": "-outsize 25% 0 -r cubic",
         # "contour_level": 0.,
         # "hmm_args": "--triangles 5000000 -e 0.0001 -b 0.7 --blur 1",  # --border-size 300",
-        "hmm_args": "--triangles 15000000 -e 0.0001 --blur 1",  # --border-size 300",
+        "hmm_args": "--triangles 50000000 -e 0.00001",  # --border-size 300",
         "target_size": 10,
         "gdal_merge_args": "-a_nodata -5800",
+        "output_scaling": "llh2ecef",
+        "z_exag": 5,
     },
     "sfbay_topobathy": {
         "dems": glob(["data/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS/TOPOBATHY_SAN_FRANCISCO_ELEV_METERS.tif"]),
@@ -76,6 +78,22 @@ topos = {
         #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
         "hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
         "target_size": 10,
+    },
+    "hawaii_etopo": {
+        "dems": glob(["data/etopo/*.tif"]),
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -160.525224 23.173832 -153.791178 18.233182",
+        "hmm_args": "--triangles 25000000 -e 0.0000000001",
+        "target_size": 10,
+        "output_scaling": "llh2ecef",
+        "z_exag": 5,
+    },
+    "hawaii_gebco": {
+        "dems": glob(["data/gebco_2022/*.tif"]),
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -160.525224 23.173832 -153.791178 18.233182",
+        "hmm_args": "--triangles 25000000 -e 0.00000000000001 --blur 1",
+        "target_size": 10,
+        "output_scaling": "llh2ecef",
+        "z_exag": 5,
     },
     "copernicus": {
         "dems": glob([
