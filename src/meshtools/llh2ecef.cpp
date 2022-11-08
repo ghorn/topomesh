@@ -137,8 +137,8 @@ int32_t main(int32_t argc, char *argv[]) {
     min_x = std::min(min_x, static_cast<double>(point.x));
     max_y = std::max(max_y, static_cast<double>(point.y));
     min_y = std::min(min_y, static_cast<double>(point.y));
-    max_z = std::max(max_z, point_z);
-    min_z = std::min(min_z, point_z);
+    max_z = std::max(max_z, static_cast<double>(point.z));
+    min_z = std::min(min_z, static_cast<double>(point.z));
 
     // compute min/max of lon/lat
     min_lon = std::min(min_lon, lon);
