@@ -1,5 +1,5 @@
 # system dependencies
-sudo apt install -y build-essential zip libglm-dev gdal-bin jq lynx wget
+sudo apt install -y build-essential zip libglm-dev gdal-bin jq lynx wget python-is-python3 libeigen3-dev
 
 # bazel
 if which bazel ; then

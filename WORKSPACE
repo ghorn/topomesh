@@ -28,3 +28,29 @@ http_archive(
     strip_prefix = "libtrix-fb23d3df2c4c607a28fbefbbda21fa43b1522b3f",
     urls = ["https://github.com/anoved/libtrix/archive/fb23d3df2c4c607a28fbefbbda21fa43b1522b3f.zip"],
 )
+
+pybind11_bazel_commit = "faf56fb3df11287f26dbc66fdedf60a2fc2c6631"
+
+# pybind11_bazel_commit = "72cbbf1fbc830e487e3012862b7b720001b70672"
+
+http_archive(
+    name = "pybind11_bazel",
+    sha256 = "a185aa68c93b9f62c80fcb3aadc3c83c763854750dc3f38be1dadcb7be223837",
+    strip_prefix = "pybind11_bazel-{}".format(pybind11_bazel_commit),
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/{}.zip".format(pybind11_bazel_commit)],
+)
+
+# We still require the pybind library.
+pybind11_version = "2.10.1"
+
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11.BUILD",
+    sha256 = "111014b516b625083bef701df7880f78c2243835abdb263065b6b59b960b6bad",
+    strip_prefix = "pybind11-{}".format(pybind11_version),
+    urls = ["https://github.com/pybind/pybind11/archive/v{}.tar.gz".format(pybind11_version)],
+)
+
+load("@pybind11_bazel//:python_configure.bzl", "python_configure")
+
+python_configure(name = "local_config_python")

@@ -87,6 +87,26 @@ du -hs $@
 """.format(gdalinfo = gdalinfo_name, resized_name = resized_name),
     )
 
+    # optionally diffuse the image
+    if "diffuse_nodata" in topo and topo["diffuse_nodata"] == True:
+        diffused_png_name = "{name}_diffused_png".format(**topo)
+        # native.genrule(
+        #     name = diffused_png_name,
+        #     srcs = [png_name],
+        #     outs = ["{}.png".format(diffused_png_name)],
+        #     tools = [":diffuse"],
+        #     cmd = "$(location :diffuse) $< $@",
+        # )
+
+        native.py_binary(
+            name = "diffuse",
+            srcs = ["diffuse.py"],
+            deps = ["//diffuse_binding:diffuse_binding"],
+            data = [png_name],
+            args = ["$(location {})".format(png_name)],  #"$(location {})".format(diffused_png_name)],
+        )
+        # png_name = diffused_png_name
+
     # mesh it
     unscaled_stl_name = "{name}_unscaled_stl".format(**topo)
     native.genrule(

@@ -1,0 +1,105 @@
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
+
+cxx_opts = [
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wconversion",
+    "-Wcast-align",
+    "-Wdouble-promotion",
+    "-Wformat-security",
+    "-Winvalid-pch",
+    "-Wmissing-format-attribute",
+    "-Wnull-dereference",
+    "-Wpacked",
+    "-Wpointer-arith",
+    "-Wredundant-decls",
+    "-Wshadow",
+    "-Wsign-compare",
+    "-Wsign-conversion",
+    "-Wswitch-default",
+    "-Wswitch-enum",
+    "-Wundef",
+    "-Wunused",
+    "-Wwrite-strings",
+    "-Wduplicated-branches",
+    "-Wduplicated-cond",
+    "-Wlogical-op",
+    "-Wmisleading-indentation",
+    "-Wunused-but-set-parameter",
+    "-Wuseless-cast",
+    "-Winit-self",
+    "-Wnon-virtual-dtor",
+    #"-Wold-style-cast",
+    "-Woverloaded-virtual",
+    "-fdiagnostics-color=always",
+]
+
+cc_library(
+    name = "diffuse",
+    srcs = ["diffuse.cpp"],
+    hdrs = ["diffuse.hpp"],
+    copts = [
+        "-isystem /usr/include/eigen3",
+        # "-DMKL_INT=int64_t",
+        "-DMKL_LP64",
+        "-m64",  # intel mkl
+        "-isystem /usr/include/mkl",
+        # "-fopenmp",
+    ] + cxx_opts,
+    linkopts = [
+        # # /usr/lib/x86_64-linux-gnu
+        # # "-L${MKLROOT}/lib/intel64",
+        # "-lmkl_rt",
+        # "-Wl,--no-as-needed",
+        # "-lpthread",
+        # "-lm",
+        # "-ldl",
+
+        # # "-L${MKLROOT}/lib/intel64",
+        # "-Wl,--no-as-needed",
+        # "-lmkl_intel_lp64",
+        # # "-lmkl_gnu_thread",
+        # "-lmkl_sequential",
+        # "-lmkl_core",
+        # # "-lgomp",
+        # "-lpthread",
+        # "-lm",
+        # "-ldl",
+        "-Wl,--start-group",
+        "/usr/lib/x86_64-linux-gnu/libmkl_intel_lp64.a",
+        # "/usr/lib/x86_64-linux-gnu/libmkl_sequential.a",
+        "/usr/lib/x86_64-linux-gnu/libmkl_gnu_thread.a",
+        "/usr/lib/x86_64-linux-gnu/libmkl_core.a",
+        "-Wl,--end-group",
+        "-lgomp",
+        "-lpthread",
+        "-lm",
+        "-ldl",
+    ],
+)
+
+pybind_extension(
+    name = "diffuse_py",
+    srcs = ["diffuse_py.cpp"],
+    copts = [
+        "-isystem /usr/include/eigen3",
+        "-isystem /usr/include/mkl",
+        "-DMKL_LP64",
+    ],
+    deps = [":diffuse"],
+)
+
+py_library(
+    name = "diffuse_binding",
+    srcs = ["diffuse_binding.py"],
+    data = [":diffuse_py.so"],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "test_diffuse_binding",
+    srcs = ["test_diffuse_binding.py"],
+    data = [":diffuse_binding"],
+)
