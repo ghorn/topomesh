@@ -1,7 +1,7 @@
 load(":pad_string.bzl", "pad")
 load(":pipeline.bzl", "process_terrains")
 
-# copernicus coordinatescat
+# copernicus coordinates
 north_range = range(24, 72)
 
 max_east = 39
@@ -106,19 +106,3 @@ topos = {
 }
 
 process_terrains(topos)
-
-## convert to ellipsoid
-#genrule(
-#    name = "ellipsoid",
-#    srcs = [
-#        "copernicus.stl",
-#    ],
-#    outs = ["ellipsoid.ply"],
-#    cmd = """\
-#$(location //src/meshtools:llh2ecef) $< $@
-#du -hs $@
-#""",
-#    tools = [
-#        "//src/meshtools:llh2ecef",
-#    ]
-#)
