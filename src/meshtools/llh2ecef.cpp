@@ -18,22 +18,36 @@ constexpr double wgs84_F = 1 / 298.257223563;
 constexpr double wgs84_E = sqrt (2 * wgs84_F - wgs84_F * wgs84_F);
 
 
-static glm::dmat3 DcmEcef2Ned(const double lat_rad, const double lon_rad) {
+static glm::dmat3 DcmEcef2Enu(const double lat_rad, const double lon_rad) {
   double sin_lat = sin(lat_rad);
   double cos_lat = cos(lat_rad);
   double sin_lon = sin(lon_rad);
   double cos_lon = cos(lon_rad);
-  glm::dmat3 dcm;
-  dcm[0][0] = -sin_lat * cos_lon;
-  dcm[1][0] = -sin_lat * sin_lon;
-  dcm[2][0] = cos_lat;
-  dcm[0][1] = -sin_lon;
-  dcm[1][1] = cos_lon;
-  dcm[2][1] = 0.0;
-  dcm[0][2] = -cos_lat * cos_lon;
-  dcm[1][2] = -cos_lat * sin_lon;
-  dcm[2][2] = -sin_lat;
-  return dcm;
+  glm::dmat3 dcm_ecef2ned;
+  dcm_ecef2ned[0][0] = -sin_lat * cos_lon;
+  dcm_ecef2ned[1][0] = -sin_lat * sin_lon;
+  dcm_ecef2ned[2][0] = cos_lat;
+  dcm_ecef2ned[0][1] = -sin_lon;
+  dcm_ecef2ned[1][1] = cos_lon;
+  dcm_ecef2ned[2][1] = 0.0;
+  dcm_ecef2ned[0][2] = -cos_lat * cos_lon;
+  dcm_ecef2ned[1][2] = -cos_lat * sin_lon;
+  dcm_ecef2ned[2][2] = -sin_lat;
+
+
+  glm::dmat3 dcm_ned2enu;
+  dcm_ned2enu[0][0] = 0.0;
+  dcm_ned2enu[1][0] = 1.0;
+  dcm_ned2enu[2][0] = 0.0;
+  dcm_ned2enu[0][1] = 1.0;
+  dcm_ned2enu[1][1] = 0.0;
+  dcm_ned2enu[2][1] = 0.0;
+  dcm_ned2enu[0][2] = 0.0;
+  dcm_ned2enu[1][2] = 0.0;
+  dcm_ned2enu[2][2] = -1.0;
+
+  return dcm_ned2enu * dcm_ecef2ned;
+
 }
 
 static glm::dvec3 Llh2Ecef(const double lat, const double lon, const double height) {
@@ -97,10 +111,9 @@ int32_t main(int32_t argc, char *argv[]) {
                                        center_lon_deg * M_PI / 180.,
                                        0.);
 
-  const glm::dmat3 dcm_ecef2ned = DcmEcef2Ned(center_lat_deg * M_PI / 180.,
+  const glm::dmat3 dcm_ecef2enu = DcmEcef2Enu(center_lat_deg * M_PI / 180.,
                                               center_lon_deg * M_PI / 180.);
 
-  // glm::mat3 dcm_ecef2ned = Ecef2NedMatrix(ref_ecef);
   double max_x = -std::numeric_limits<double>::infinity();
   double min_x = std::numeric_limits<double>::infinity();
   double max_y = -std::numeric_limits<double>::infinity();
@@ -130,7 +143,7 @@ int32_t main(int32_t argc, char *argv[]) {
 
     const double height = point_z;
     const glm::dvec3 point_ecef = Llh2Ecef(lat, lon, height);
-    point = dcm_ecef2ned * (point_ecef - ref_ecef);
+    point = dcm_ecef2enu * (point_ecef - ref_ecef);
 
     // compute min/max of x/y/z
     max_x = std::max(max_x, static_cast<double>(point.x));
@@ -160,10 +173,10 @@ int32_t main(int32_t argc, char *argv[]) {
   fprintf(stderr, "max_lat: %.6f [deg]\n", (max_lat * 180.0 / M_PI));
 
   // output translation/scaling
-  const float xy_scale_factor = static_cast<float>(target_size / std::min(max_x - min_x, max_y - min_y));
+  const float scale_factor = static_cast<float>(target_size / std::min(max_x - min_x, max_y - min_y));
   for (glm::vec3 &point : points) {
-    point.z -= static_cast<float>(max_z);
-    point *= xy_scale_factor;
+    point.z -= static_cast<float>(min_z);
+    point *= scale_factor;
   }
 
   WriteBinaryStl(output_path, points, triangles);
