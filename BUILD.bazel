@@ -61,7 +61,7 @@ topos = {
         "hmm_args": "--triangles 10000000 -e 0.0001 -b 0.7",
         "target_size": 10,
     },
-    "gebco_2022_sub_ice": {
+    "gebco_sub_ice": {
         "dems": glob(["data/gebco_2022_sub_ice/*.tif"]),
         "resize_args": "-outsize 3% 0 -r cubic",
         #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
@@ -70,7 +70,7 @@ topos = {
         "target_size": 10,
         "z_exag": 5,
     },
-    "gebco_2022": {
+    "gebco": {
         "dems": glob(["data/gebco_2022/*.tif"]),
         "resize_args": "-outsize 3% 0 -r cubic",
         #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
