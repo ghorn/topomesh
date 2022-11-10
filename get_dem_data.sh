@@ -37,7 +37,14 @@ mkdir -p "$socal_data_dir"
 # 3 arc-second
 wget "https://www.ngdc.noaa.gov/thredds/fileServer/crm/crm_socal_3as_vers2.nc" -P ${socal_data_dir}
 gdal_translate "${socal_data_dir}/crm_socal_3as_vers2.nc" "${socal_data_dir}/crm_socal_3as_vers2.tif"
+rm "${socal_data_dir}/crm_socal_3as_vers2.nc"
 
+####################### U.S. Coastal Relief Model - Central Pacific ##################
+central_pac_data_dir="data/central_pacific"
+mkdir -p "$central_pac_data_dir"
+wget "https://www.ngdc.noaa.gov/thredds/fileServer/crm/crm_vol7.nc" -P ${central_pac_data_dir}
+gdal_translate "${central_pac_data_dir}/crm_vol7.nc" "${central_pac_data_dir}/crm_vol7.tif"
+rm "${central_pac_data_dir}/crm_vol7.nc"
 
 ############################ etopo 2022 ##########################
 # this is a global bathymetry dataset
