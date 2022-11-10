@@ -1,11 +1,6 @@
 load(":pad_string.bzl", "pad")
 load(":pipeline.bzl", "process_terrains")
 
-py_binary(
-    name = "zscale",
-    srcs = ["zscale.py"],
-)
-
 # copernicus coordinatescat
 north_range = range(24, 72)
 
@@ -51,7 +46,9 @@ topos = {
         #"resize_args": "-outsize 5% 0 -r cubic",
         "contour_level": 0.,
         "hmm_args": "--triangles 1000000 -e 0.0001 -b 0.7",  # --border-size 300",
+        "output_scaling": "ned",
         "target_size": 10,
+        "z_exag": 1,
     },
     "measures_greenland": {
         "dems": glob(["data/measures_greenland/*/*/*/*/tile_*_dem_*.tif"]),
@@ -69,14 +66,18 @@ topos = {
         "resize_args": "-outsize 3% 0 -r cubic",
         #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
         "hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
+        "output_scaling": "llh2ecef",
         "target_size": 10,
+        "z_exag": 5,
     },
     "gebco_2022": {
         "dems": glob(["data/gebco_2022/*.tif"]),
         "resize_args": "-outsize 3% 0 -r cubic",
         #"hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
         "hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
+        "output_scaling": "llh2ecef",
         "target_size": 10,
+        "z_exag": 5,
     },
     "hawaii_gebco": {
         "dems": glob(["data/gebco_2022/*.tif"]),
