@@ -20,6 +20,24 @@ copernicus_coords = \
 
 # all the topographies to be processed
 topos = {
+    "zion": {
+        "dems": glob(["data/zion/USGS_NED_OPR_UT_ZionNP_QL1*.img"]),
+        # the leftmost and topmost pixels have no data
+        "region_of_interest_command": "gdal_translate -srcwin  1 1 9671 15005",
+        "hmm_args": "--triangles 5000000 -e 0.000001",
+        "target_size": 10,
+        "output_scaling": "ned",
+        "z_exag": 1,
+    },
+    "zion_full": {
+        "dems": glob(["data/zion/USGS_NED_OPR_UT_ZionNP_QL2*.img"]),
+        "resize_args": "-outsize 25% 0 -r cubic",
+        "gdal_merge_args": "-init -3.4028230607370965e+38 -a_nodata -3.4028230607370965e+38 -n -3.4028230607370965e+38",
+        "hmm_args": "--triangles 5000000 -e 0.000001",
+        "target_size": 10,
+        "output_scaling": "ned",
+        "z_exag": 1,
+    },
     "socal": {
         "dems": glob(["data/socal/*3as*.tif"]),
         # "resize_args": "-outsize 20% 0 -r cubic",
@@ -45,7 +63,7 @@ topos = {
         "region_of_interest_command": "gdal_translate -projwin 538300 4194644 558250 4175530",
         #"resize_args": "-outsize 5% 0 -r cubic",
         "contour_level": 0.,
-        "hmm_args": "--triangles 1000000 -e 0.0001 -b 0.7",  # --border-size 300",
+        "hmm_args": "--triangles 1000000 -e 0.0001",  # --border-size 300",
         "output_scaling": "ned",
         "target_size": 10,
         "z_exag": 1,

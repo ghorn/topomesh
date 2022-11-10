@@ -2,6 +2,32 @@
 
 set -euo pipefail
 
+#################################### zion #################################
+source "zion_dem_names.sh"
+zion_data_dir="data/zion"
+mkdir -p "$zion_data_dir"
+
+# transform names to URLs
+zion_ql2_dem_urls=$zion_dem_names_ql2
+for i in ${!zion_dem_names_ql2[@]}; do
+    zion_ql2_dem_urls[i]="https://storage.googleapis.com/state-of-utah-sgid-downloads/lidar/zion-np-2016/QL2/DEMs/${zion_dem_names_ql2[i]}.zip"
+done
+
+zion_ql1_dem_urls=$zion_dem_names_ql1
+for i in ${!zion_dem_names_ql1[@]}; do
+    zion_ql1_dem_urls[i]="https://storage.googleapis.com/state-of-utah-sgid-downloads/lidar/zion-np-2016/QL1/DEMs/${zion_dem_names_ql1[i]}.zip"
+done
+
+# use xargs to download them all in parallel using wget
+printf '%s\0' "${zion_ql2_dem_urls[@]}" "${zion_ql1_dem_urls[@]}" | xargs -P16 -n 1 -0 wget -P "$zion_data_dir"
+
+# unzip them all
+for zipfile in "$zion_data_dir"/*.zip; do
+    unzip -d "$zion_data_dir" "$zipfile"
+    rm "$zipfile"
+done
+
+
 ####################### U.S. Coastal Relief Model - Southern California Version 2 ##################
 socal_data_dir="data/socal"
 mkdir -p "$socal_data_dir"
