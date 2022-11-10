@@ -59,7 +59,9 @@ topos = {
         # "contour_level": 0.,
         #"hmm_args": "--triangles 2000c000 -e 0.001 --blur 4 --gamma 0.2"
         "hmm_args": "--triangles 10000000 -e 0.0001 -b 0.7",
+        "output_scaling": "ned",
         "target_size": 10,
+        "z_exag": 1,
     },
     "gebco_sub_ice": {
         "dems": glob(["data/gebco_2022_sub_ice/*.tif"]),

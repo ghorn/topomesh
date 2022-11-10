@@ -10,6 +10,10 @@
 
 #include "src/meshtools/stl.hpp"
 
+static bool IsClose(const float x, const float y, const float reltol) {
+  return std::fabs(x - y) <= reltol * std::fabs(x);
+}
+
 int32_t main(int32_t argc, char *argv[]) {
   // Parse flags.
   if (argc != 9) {
@@ -64,7 +68,7 @@ int32_t main(int32_t argc, char *argv[]) {
   //    The shortest size determines the size, because wood comes in long boards and the
   //    longest size is assumed to fit.
   // 4. also scale z by z_exag
-  if (std::abs(dmeter_dpixel_x) != std::abs(dmeter_dpixel_y)) {
+  if (!IsClose(std::abs(dmeter_dpixel_x), std::abs(dmeter_dpixel_y), 1e-3f)){
     // TODO(greg): figure out which is x and which is y
     std::cerr << "Warning: dmeter_dpixel_x and dmeter_dpixel_y are not equal. This will cause the mesh to be stretched." << std::endl;
     std::exit(1);
