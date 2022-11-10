@@ -99,7 +99,9 @@ topos = {
         #"resize_args": -outsize 10% 0 -r cubic",
         "hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
         #"hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
+        "output_scaling": "llh2ecef",
         "target_size": 10,
+        "z_exag": 5,
     },
 }
 
