@@ -82,7 +82,7 @@ topos = {
         "z_exag": 5,
     },
     "hawaii_gebco": {
-        "dems": glob(["data/gebco_2022/*.tif"]),
+        "dems": glob(["data/gebco_2022/*n90.0_s0.0_w-180.0_e-90.0.tif"]),
         "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -161.4 23.8 -153.2 17.7",
         "hmm_args": "--triangles 50000000 -e 0.000000000000001 --blur 1",
         "target_size": 10,
