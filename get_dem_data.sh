@@ -45,9 +45,16 @@ wget -np -r -nH -L --cut-dirs=5 --no-check-certificate \
 ##################################### copernicus #############################
 # See https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
 # download dems
-aws s3 cp s3://raster/COP90/ data --recursive --endpoint-url https://opentopography.s3.sdsc.edu --no-sign-request
+aws s3 cp s3://raster/COP90/COP90_hh data/copernicus --recursive --endpoint-url https://opentopography.s3.sdsc.edu --no-sign-request \
+    --exclude "*" \
+    --include "Copernicus_DSM_COG_30_N[234567]*_E[0123]*_DEM.tif" \
+    --include "Copernicus_DSM_COG_30_N[234567]*_W[01][0123]*_DEM.tif"
+
 # sync (download missing dems)
-aws s3 sync s3://raster/COP90/ data --recursive --endpoint-url https://opentopography.s3.sdsc.edu --no-sign-request
+aws s3 sync s3://raster/COP90/COP90_hh data/copernicus --recursive --endpoint-url https://opentopography.s3.sdsc.edu --no-sign-request \
+    --exclude "*" \
+    --include "Copernicus_DSM_COG_30_N[234567]*_E[0123]*_DEM.tif" \
+    --include "Copernicus_DSM_COG_30_N[234567]*_W[01][0123]*_DEM.tif"
 
 ####################################### gebco 2022 #################################
 # download the global coverage grid from

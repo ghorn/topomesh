@@ -91,7 +91,7 @@ topos = {
     },
     "copernicus": {
         "dems": glob([
-            "data/COP90_hh/Copernicus_DSM_COG_30_{coord}_DEM.tif".format(coord = coord)
+            "data/copernicus/Copernicus_DSM_COG_30_{coord}_DEM.tif".format(coord = coord)
             for coord in copernicus_coords
         ]),
         #"resize_args": "-outsize 1% 0 -r cubic",
