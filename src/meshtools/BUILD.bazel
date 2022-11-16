@@ -124,3 +124,13 @@ cc_binary(
     visibility = ["//visibility:public"],
     deps = [":meshtools"],
 )
+
+cc_binary(
+    name = "llh2gnomonic",
+    srcs = [
+        "llh2gnomonic.cpp",
+    ],
+    copts = cxx_opts,
+    visibility = ["//visibility:public"],
+    deps = [":meshtools"],
+)

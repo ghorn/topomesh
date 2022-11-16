@@ -2,7 +2,7 @@ load(":pad_string.bzl", "pad")
 load(":pipeline.bzl", "process_terrains")
 
 # copernicus coordinates
-north_range = range(24, 72)
+north_range = range(24, 89)
 
 max_east = 39
 
@@ -146,9 +146,10 @@ topos = {
         #"resize_args": "-outsize 1% 0 -r cubic",
         "resize_args": "-outsize 5% 0 -r cubic",
         #"resize_args": -outsize 10% 0 -r cubic",
-        "hmm_args": "--triangles 2000000 -e 0.001 --blur 4 --gamma 0.2",
+        "hmm_args": "--triangles 5000000 -e 0.001 --blur 1 --gamma 0.2",
         #"hmm_args": "--triangles 2000000 -e 0.0001 -b 0.7",
-        "output_scaling": "llh2ecef",
+        # "output_scaling": "llh2ecef",
+        "output_scaling": "llh2gnomonic",
         "target_size": 10,
         "z_exag": 5,
     },

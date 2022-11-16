@@ -117,6 +117,8 @@ du -hs $@
     # convert to ECEF
     if topo["output_scaling"] == "llh2ecef":
         convert_to_ecef(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"])
+    elif topo["output_scaling"] == "llh2gnomonic":
+        convert_to_gnomonic(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"])
     elif topo["output_scaling"] == "ned":
         scale_simple(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"])
     else:
@@ -192,6 +194,47 @@ $(location //src/meshtools:print_stl_dimensions) $@
 """.format(gdalinfo = gdalinfo_name, input_stl = unscaled_stl_name, target_size = target_size, z_exag = z_exag),
         tools = [
             "//src/meshtools:llh2ecef",
+            "//src/meshtools:print_stl_dimensions",
+        ],
+    )
+
+def convert_to_gnomonic(name, gdalinfo_name, unscaled_stl_name, target_size, z_exag):
+    gnomonic_stl_name = "{}_stl".format(name)
+    native.genrule(
+        name = gnomonic_stl_name,
+        srcs = [unscaled_stl_name, gdalinfo_name],
+        outs = ["{}.stl".format(name)],
+        cmd = """\
+# we expect the geoTransform to be something like:
+#   [
+#     -128.000416666665,
+#     0.00083333333,
+#     0,
+#     37.000416662664996,
+#     0,
+#     -0.00083333333
+#   ]
+# Make sure those numbers are 0
+test `jq ".geoTransform[2]" $(location {gdalinfo})` -eq 0
+test `jq ".geoTransform[4]" $(location {gdalinfo})` -eq 0
+
+$(location //src/meshtools:llh2gnomonic) $(location {input_stl}) $@ \
+    `jq ".geoTransform[0]" $(location {gdalinfo})` \
+    `jq ".geoTransform[1]" $(location {gdalinfo})` \
+    `jq ".geoTransform[3]" $(location {gdalinfo})` \
+    `jq ".geoTransform[5]" $(location {gdalinfo})` \
+    `jq ".size[0]" $(location {gdalinfo})` \
+    `jq ".size[1]" $(location {gdalinfo})` \
+    `jq ".bands[0].computedMin" $(location {gdalinfo})` \
+    `jq ".bands[0].computedMax" $(location {gdalinfo})` \
+    {target_size} \
+    {z_exag}
+
+# print new dimensions
+$(location //src/meshtools:print_stl_dimensions) $@
+""".format(gdalinfo = gdalinfo_name, input_stl = unscaled_stl_name, target_size = target_size, z_exag = z_exag),
+        tools = [
+            "//src/meshtools:llh2gnomonic",
             "//src/meshtools:print_stl_dimensions",
         ],
     )

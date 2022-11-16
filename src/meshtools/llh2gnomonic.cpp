@@ -5,64 +5,27 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <tuple>
 #include <glm/glm.hpp>
 
 #include "src/meshtools/stl.hpp"
+
 // WGS84 equitorial radius.
 constexpr double wgs84_A = 6378137.0;
 
-// WGS84 flattening term.
-constexpr double wgs84_F = 1 / 298.257223563;
+static std::pair<double, double> Llh2Gnomonic(const double lat_rad, const double lon_rad, const double center_lat_rad, const double center_lon_rad) {
+  const double cos_dlon = cos(lon_rad - center_lon_rad);
+  const double sin_dlon = sin(lon_rad - center_lon_rad);
+  const double sin_lat0 = sin(center_lat_rad);
+  const double cos_lat0 = cos(center_lat_rad);
+  const double sin_lat = sin(lat_rad);
+  const double cos_lat = cos(lat_rad);
 
-// EGS84 eccentricity.
-constexpr double wgs84_E = sqrt (2 * wgs84_F - wgs84_F * wgs84_F);
-
-
-static glm::dmat3 DcmEcef2Enu(const double lat_rad, const double lon_rad) {
-  double sin_lat = sin(lat_rad);
-  double cos_lat = cos(lat_rad);
-  double sin_lon = sin(lon_rad);
-  double cos_lon = cos(lon_rad);
-  glm::dmat3 dcm_ecef2ned;
-  dcm_ecef2ned[0][0] = -sin_lat * cos_lon;
-  dcm_ecef2ned[1][0] = -sin_lat * sin_lon;
-  dcm_ecef2ned[2][0] = cos_lat;
-  dcm_ecef2ned[0][1] = -sin_lon;
-  dcm_ecef2ned[1][1] = cos_lon;
-  dcm_ecef2ned[2][1] = 0.0;
-  dcm_ecef2ned[0][2] = -cos_lat * cos_lon;
-  dcm_ecef2ned[1][2] = -cos_lat * sin_lon;
-  dcm_ecef2ned[2][2] = -sin_lat;
-
-
-  glm::dmat3 dcm_ned2enu;
-  dcm_ned2enu[0][0] = 0.0;
-  dcm_ned2enu[1][0] = 1.0;
-  dcm_ned2enu[2][0] = 0.0;
-  dcm_ned2enu[0][1] = 1.0;
-  dcm_ned2enu[1][1] = 0.0;
-  dcm_ned2enu[2][1] = 0.0;
-  dcm_ned2enu[0][2] = 0.0;
-  dcm_ned2enu[1][2] = 0.0;
-  dcm_ned2enu[2][2] = -1.0;
-
-  return dcm_ned2enu * dcm_ecef2ned;
-
+  const double cos_c = sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_dlon;
+  const double x = (cos_lat * sin_dlon) / cos_c;
+  const double y = (cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_dlon) / cos_c;
+  return std::pair<double, double>(x, y);
 }
-
-static glm::dvec3 Llh2Ecef(const double lat, const double lon, const double height) {
-  const double d = wgs84_E * sin(lat);
-  const double n = wgs84_A / sqrt(1 - d * d);
-
-  glm::dvec3 ecef;
-  ecef[0] = (n + height) * cos(lat) * cos(lon);
-  ecef[1] = (n + height) * cos(lat) * sin(lon);
-  ecef[2] = ((1 - wgs84_E * wgs84_E) * n + height) * sin(lat);
-
-  return ecef;
-}
-
-
 
 int32_t main(int32_t argc, char *argv[]) {
   // Parse flags.
@@ -107,17 +70,14 @@ int32_t main(int32_t argc, char *argv[]) {
   // Reference ECEF
   const double center_lat_deg = lat0_deg + 0.5 * dlat_deg_dpixel * static_cast<double>(n_lat);
   const double center_lon_deg = lon0_deg + 0.5 * dlon_deg_dpixel * static_cast<double>(n_lon);
-  const glm::dvec3 ref_ecef = Llh2Ecef(center_lat_deg * M_PI / 180.,
-                                       center_lon_deg * M_PI / 180.,
-                                       0.);
-
-  const glm::dmat3 dcm_ecef2enu = DcmEcef2Enu(center_lat_deg * M_PI / 180.,
-                                              center_lon_deg * M_PI / 180.);
+  const double center_lat = center_lat_deg * M_PI / 180.0;
+  const double center_lon = center_lon_deg * M_PI / 180.0;
 
   double max_x = -std::numeric_limits<double>::infinity();
   double min_x = std::numeric_limits<double>::infinity();
   double max_y = -std::numeric_limits<double>::infinity();
   double min_y = std::numeric_limits<double>::infinity();
+  double max_z = -std::numeric_limits<double>::infinity();
   double min_z = std::numeric_limits<double>::infinity();
 
   const double lon0 = lon0_deg * M_PI / 180.;
@@ -127,23 +87,27 @@ int32_t main(int32_t argc, char *argv[]) {
 
   const double latF = lat0 + dlat_dpixel * static_cast<double>(n_lat);
 
+  const double lat_extent_in_meters = wgs84_A * (latF - lat0);
+
   for (glm::vec3 &point : points) {
     const double point_x = static_cast<double>(point.x);
     const double point_y = static_cast<double>(point.y);
-    const double point_z = z_exag*(min_height + (max_height - min_height) * static_cast<double>(point.z));
+    const double point_z = z_exag*(min_height + (max_height - min_height) * static_cast<double>(point.z)) / lat_extent_in_meters;
 
     const double lat = latF - dlat_dpixel * point_y;
     const double lon = lon0 + dlon_dpixel * point_x;
 
-    const double height = point_z;
-    const glm::dvec3 point_ecef = Llh2Ecef(lat, lon, height);
-    point = dcm_ecef2enu * (point_ecef - ref_ecef);
+    const auto [x, y] = Llh2Gnomonic(lat, lon, center_lat, center_lon);
+    point.x = static_cast<float>(x);
+    point.y = static_cast<float>(y);
+    point.z = static_cast<float>(point_z);
 
     // compute min/max of x/y/z
     max_x = std::max(max_x, static_cast<double>(point.x));
     min_x = std::min(min_x, static_cast<double>(point.x));
     max_y = std::max(max_y, static_cast<double>(point.y));
     min_y = std::min(min_y, static_cast<double>(point.y));
+    max_z = std::max(max_z, static_cast<double>(point.z));
     min_z = std::min(min_z, static_cast<double>(point.z));
   }
 
