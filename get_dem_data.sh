@@ -2,6 +2,30 @@
 
 set -euo pipefail
 
+
+############## canyonlands/moab 1/3 arc second #############
+southern_utah_data_dir="data/southern_utah_1_3_arc_second"
+mkdir -p "$southern_utah_data_dir"
+
+southern_utah_dems=(
+    "n38w110/USGS_13_n38w110_20220720" \
+    "n38w111/USGS_13_n38w111_20211215" \
+    "n39w110/USGS_13_n39w110_20220510" \
+    "n39w111/USGS_13_n39w111_20211215" \
+    "n38w113/USGS_13_n38w113_20211215" \
+    "n38w114/USGS_13_n38w114_20211215")
+
+# transform names to URLs
+southern_utah_urls=()
+for dem in "${southern_utah_dems[@]}"; do
+    southern_utah_urls+=("https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/TIFF/historical/${dem}.tif")
+    # southern_utah_urls+=("https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/ArcGrid/${dem}.zip")
+done
+
+# download them all with xargs for parallelism
+echo "Downloading southern utah 1/3 arc second DEMs"
+printf '%s\0' "${southern_utah_urls[@]}" | xargs -n 1 -P 16 -0 wget -P "$southern_utah_data_dir"
+
 #################################### zion #################################
 source "zion_dem_names.sh"
 zion_data_dir="data/zion"

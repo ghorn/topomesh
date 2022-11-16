@@ -20,6 +20,29 @@ copernicus_coords = \
 
 # all the topographies to be processed
 topos = {
+    "the_rock": {
+        "dems": glob(["data/southern_utah_1_3_arc_second/*{}*.tif".format(latlon) for latlon in [
+            "n38w113",
+            "n38w114",
+        ]]),
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.11 37.25 -112.9 37.07",
+        "hmm_args": "--triangles 5000000 -e 0.000001",
+        "target_size": 10,
+        "output_scaling": "llh2ecef",
+        "z_exag": 1,
+    },
+    "canyonlands": {
+        "dems": glob(["data/southern_utah_1_3_arc_second/*{}*.tif".format(latlon) for latlon in [
+            "n38w110",
+            "n38w111",
+            "n39w110",
+            "n39w111",
+        ]]),
+        "hmm_args": "--triangles 5000000 -e 0.000001",
+        "target_size": 10,
+        "output_scaling": "llh2ecef",
+        "z_exag": 1,
+    },
     "zion": {
         "dems": glob(["data/zion/USGS_NED_OPR_UT_ZionNP_QL1*.img"]),
         # the leftmost and topmost pixels have no data
