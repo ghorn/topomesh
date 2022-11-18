@@ -25,7 +25,20 @@ topos = {
             "n38w113",
             "n38w114",
         ]]),
-        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.11 37.25 -112.9 37.07",
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.07 37.175 -112.98 37.11",
+        "hmm_args": "--triangles 2000000 -e 0.000001",
+        "target_size": 10,
+        "output_scaling": "llh2ecef",
+        "z_exag": 1,
+    },
+    "the_rock_view": {
+        "dems": glob(["data/southern_utah_1_3_arc_second/*{}*.tif".format(latlon) for latlon in [
+            "n38w113",
+            "n38w114",
+        ]]),
+        # "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.07 37.27 -112.92 37.12",
+        # with checkerboard mesa:
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.07 37.27 -112.86 37.12",
         "hmm_args": "--triangles 5000000 -e 0.000001",
         "target_size": 10,
         "output_scaling": "llh2ecef",
