@@ -38,8 +38,10 @@ topos = {
         ]]),
         # "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.07 37.27 -112.92 37.12",
         # with checkerboard mesa:
-        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.07 37.27 -112.86 37.12",
-        "hmm_args": "--triangles 5000000 -e 0.000001",
+        # "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.07 37.29 -112.86 37.12",
+        # expanded to get a diagonal slice:
+        "region_of_interest_command": "gdal_translate -projwin_srs EPSG:4326 -projwin -113.11 37.31 -112.82 37.04",
+        "hmm_args": "--triangles 10000000 -e 0.000001",
         "target_size": 10,
         "output_scaling": "llh2ecef",
         "z_exag": 1,
