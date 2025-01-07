@@ -66,8 +66,8 @@ static glm::dvec3 Llh2Ecef(const double lat, const double lon, const double heig
 
 int32_t main(int32_t argc, char *argv[]) {
   // Parse flags.
-  if (argc != 13) {
-    fprintf(stderr, "Usage: ./llh2ecef inputpath outputpath lon0 dlon_dpixel lat0 dlat_dpixel n_lat n_lon min_height max_height target_size z_exag\n");
+  if (argc != 13 && argc != 15) {
+    fprintf(stderr, "Usage: ./llh2ecef inputpath outputpath lon0 dlon_dpixel lat0 dlat_dpixel n_lat n_lon min_height max_height target_size z_exag [center_lat_deg center_long_deg]\n");
     exit(1);
   }
   const std::string input_path = argv[1];
@@ -105,8 +105,12 @@ int32_t main(int32_t argc, char *argv[]) {
   ReadBinarySTL(input_path, points, triangles);
 
   // Reference ECEF
-  const double center_lat_deg = lat0_deg + 0.5 * dlat_deg_dpixel * static_cast<double>(n_lat);
-  const double center_lon_deg = lon0_deg + 0.5 * dlon_deg_dpixel * static_cast<double>(n_lon);
+  double center_lat_deg = lat0_deg + 0.5 * dlat_deg_dpixel * static_cast<double>(n_lat);
+  double center_lon_deg = lon0_deg + 0.5 * dlon_deg_dpixel * static_cast<double>(n_lon);
+  if (argc == 15) {
+    center_lat_deg = std::stod(argv[13]);
+    center_lon_deg = std::stod(argv[14]);
+  }
   const glm::dvec3 ref_ecef = Llh2Ecef(center_lat_deg * M_PI / 180.,
                                        center_lon_deg * M_PI / 180.,
                                        0.);

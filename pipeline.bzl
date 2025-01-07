@@ -116,7 +116,10 @@ du -hs $@
 
     # convert to ECEF
     if topo["output_scaling"] == "llh2ecef":
-        convert_to_ecef(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"])
+        center_lat_long_deg = None
+        if "llh2ecef_center_lat_long_deg" in topo:
+            center_lat_long_deg = topo["llh2ecef_center_lat_long_deg"]
+        convert_to_ecef(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"], center_lat_long_deg)
     elif topo["output_scaling"] == "llh2gnomonic":
         convert_to_gnomonic(topo["name"], gdalinfo_name, unscaled_stl_name, topo["target_size"], topo["z_exag"])
     elif topo["output_scaling"] == "ned":
@@ -157,8 +160,11 @@ du -hs $@
         ],
     )
 
-def convert_to_ecef(name, gdalinfo_name, unscaled_stl_name, target_size, z_exag):
+def convert_to_ecef(name, gdalinfo_name, unscaled_stl_name, target_size, z_exag, center_lat_long_deg):
     ecef_stl_name = "{}_stl".format(name)
+    maybe_center_lat_long_deg = ""
+    if center_lat_long_deg != None:
+        maybe_center_lat_long_deg = str(center_lat_long_deg[0]) + " " + str(center_lat_long_deg[1])
     native.genrule(
         name = ecef_stl_name,
         srcs = [unscaled_stl_name, gdalinfo_name],
@@ -186,12 +192,11 @@ $(location //src/meshtools:llh2ecef) $(location {input_stl}) $@ \
     `jq ".size[1]" $(location {gdalinfo})` \
     `jq ".bands[0].computedMin" $(location {gdalinfo})` \
     `jq ".bands[0].computedMax" $(location {gdalinfo})` \
-    {target_size} \
-    {z_exag}
+    {target_size} {z_exag} {maybe_center_lat_long_deg}
 
 # print new dimensions
 $(location //src/meshtools:print_stl_dimensions) $@
-""".format(gdalinfo = gdalinfo_name, input_stl = unscaled_stl_name, target_size = target_size, z_exag = z_exag),
+""".format(gdalinfo = gdalinfo_name, input_stl = unscaled_stl_name, target_size = target_size, z_exag = z_exag, maybe_center_lat_long_deg = maybe_center_lat_long_deg),
         tools = [
             "//src/meshtools:llh2ecef",
             "//src/meshtools:print_stl_dimensions",
