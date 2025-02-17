@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # system dependencies
 sudo apt install -y build-essential zip libglm-dev gdal-bin jq lynx wget
 
