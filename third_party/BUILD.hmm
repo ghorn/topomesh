@@ -26,4 +26,5 @@ cc_binary(
         "-Wno-sign-compare",
         "-Wno-deprecated-declarations",
     ],
+    deps = ["@glm"],
 )
