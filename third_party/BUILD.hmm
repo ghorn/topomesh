@@ -19,10 +19,12 @@ cc_binary(
         "src/triangulator.h",
     ],
     copts = [
-    	"-Werror",
+        "-Werror",
         #"-std=c++11", # default?
         # just silence whatever warnings there are
         "-Wno-comment",
         "-Wno-sign-compare",
+        "-Wno-deprecated-declarations",
     ],
+    deps = ["@glm"],
 )

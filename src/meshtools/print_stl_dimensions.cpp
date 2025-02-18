@@ -1,9 +1,9 @@
-#include <string>
-#include <getopt.h>
 #include <cassert>
-#include <iostream>
-#include <vector>
+#include <getopt.h>
 #include <glm/glm.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include "src/meshtools/stl.hpp"
 
@@ -28,12 +28,12 @@ int32_t main(int32_t argc, char *argv[]) {
   }
 
   // Translate vertices.
-  double min_x = vertices.at(0).x;
-  double max_x = vertices.at(0).x;
-  double min_y = vertices.at(0).y;
-  double max_y = vertices.at(0).y;
-  double min_z = vertices.at(0).z;
-  double max_z = vertices.at(0).z;
+  float min_x = vertices.at(0).x;
+  float max_x = vertices.at(0).x;
+  float min_y = vertices.at(0).y;
+  float max_y = vertices.at(0).y;
+  float min_z = vertices.at(0).z;
+  float max_z = vertices.at(0).z;
   for (const glm::vec3 &vertex : vertices) {
     min_x = fmin(min_x, vertex.x);
     max_x = fmax(max_x, vertex.x);

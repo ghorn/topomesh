@@ -22,18 +22,22 @@ cxx_opts = [
     "-Wundef",
     "-Wunused",
     "-Wwrite-strings",
-    "-Wduplicated-branches",
-    "-Wduplicated-cond",
-    "-Wlogical-op",
     "-Wmisleading-indentation",
     "-Wunused-but-set-parameter",
-    "-Wuseless-cast",
     "-Winit-self",
     "-Wnon-virtual-dtor",
-    #"-Wold-style-cast",
+    # "-Wold-style-cast",
     "-Woverloaded-virtual",
     "-fdiagnostics-color=always",
-]
+] + select({
+    "@bazel_tools//tools/cpp:gcc": [
+        "-Wduplicated-branches",
+        "-Wduplicated-cond",
+        "-Wlogical-op",
+        "-Wuseless-cast",
+    ],
+    "//conditions:default": [],
+})
 
 cc_library(
     name = "meshtools",
@@ -46,6 +50,7 @@ cc_library(
     ],
     copts = cxx_opts,
     visibility = ["//visibility:public"],
+    deps = ["@glm"],
 )
 
 # Convert PLY to STL.
